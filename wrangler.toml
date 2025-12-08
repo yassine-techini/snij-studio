@@ -1,0 +1,13 @@
+name = "snij-studio"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ENVIRONMENT = "production"
+FOUNDRY_API_URL = "https://snij-foundry.yassine-techini.workers.dev"
+DRUPAL_BASE_URL = "https://snij-drupal.onrender.com"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "490cd50c27f143f2a7a21690627a5f6c"
