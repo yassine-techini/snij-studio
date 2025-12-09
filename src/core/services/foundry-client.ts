@@ -7,7 +7,7 @@ export class FoundryClient {
   private token: string;
 
   constructor(env: Bindings) {
-    this.baseUrl = env.FOUNDRY_URL;
+    this.baseUrl = env.FOUNDRY_API_URL;
     this.token = env.FOUNDRY_SERVICE_TOKEN;
   }
 

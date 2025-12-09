@@ -2,7 +2,7 @@
 
 export interface Bindings {
   ANTHROPIC_API_KEY: string;
-  FOUNDRY_URL: string;
+  FOUNDRY_API_URL: string;
   FOUNDRY_SERVICE_TOKEN: string;
   DRUPAL_BASE_URL: string;
   KV: KVNamespace;
