@@ -21,7 +21,12 @@ app.use('*', secureHeaders());
 app.use(
   '*',
   cors({
-    origin: ['http://localhost:3000', 'https://snij.tn', 'https://*.snij.tn'],
+    origin: [
+      'http://localhost:3000',
+      'https://snij.tn',
+      'https://*.snij.tn',
+      'https://snij-frontend.pages.dev',
+    ],
     allowMethods: ['GET', 'POST', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization', 'Accept-Language'],
     exposeHeaders: ['X-Request-ID'],
