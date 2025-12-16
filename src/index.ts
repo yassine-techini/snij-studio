@@ -11,6 +11,7 @@ import { searchRoutes } from './routes/search';
 import { ragRoutes } from './routes/rag';
 import { summarizeRoutes } from './routes/summarize';
 import { documentsRoutes } from './routes/documents';
+import { adminRoutes } from './routes/admin';
 import { rateLimiter } from './middleware/rate-limit';
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
@@ -27,7 +28,7 @@ app.use(
       'https://*.snij.tn',
       'https://snij-frontend.pages.dev',
     ],
-    allowMethods: ['GET', 'POST', 'OPTIONS'],
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization', 'Accept-Language'],
     exposeHeaders: ['X-Request-ID'],
     maxAge: 86400,
@@ -43,6 +44,7 @@ app.route('/api/search', searchRoutes);
 app.route('/api/rag', ragRoutes);
 app.route('/api/summarize', summarizeRoutes);
 app.route('/api/documents', documentsRoutes);
+app.route('/api/admin', adminRoutes);
 
 // Health check
 app.get('/', (c) => {
@@ -71,23 +73,39 @@ app.get('/health', async (c) => {
     foundry: false,
     anthropic: false,
   };
+  const debug: Record<string, string> = {};
 
   // Check KV
   try {
     await c.env.KV.put('health-check', Date.now().toString(), { expirationTtl: 60 });
     checks.kv = true;
-  } catch {
-    checks.kv = false;
+  } catch (e) {
+    debug.kv = e instanceof Error ? e.message : 'Unknown error';
   }
 
-  // Check Foundry connectivity
+  // Check Foundry connectivity via Service Binding
   try {
-    const response = await fetch(c.env.FOUNDRY_API_URL, {
-      headers: { Authorization: `Bearer ${c.env.FOUNDRY_SERVICE_TOKEN}` },
-    });
-    checks.foundry = response.ok;
-  } catch {
-    checks.foundry = false;
+    debug.hasServiceBinding = c.env.FOUNDRY ? 'yes' : 'no';
+    debug.hasToken = c.env.FOUNDRY_SERVICE_TOKEN ? 'yes' : 'no';
+
+    if (c.env.FOUNDRY) {
+      // Utiliser le Service Binding pour éviter l'erreur 1042
+      const response = await c.env.FOUNDRY.fetch('https://foundry/', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${c.env.FOUNDRY_SERVICE_TOKEN}`,
+          'Accept': 'application/json',
+        },
+      });
+      checks.foundry = response.ok;
+      debug.foundryStatus = String(response.status);
+      if (!response.ok) {
+        const text = await response.text().catch(() => 'Could not read response');
+        debug.foundryResponse = text.slice(0, 200);
+      }
+    }
+  } catch (e) {
+    debug.foundry = e instanceof Error ? e.message : 'Unknown error';
   }
 
   // Check Anthropic API key exists
@@ -99,6 +117,7 @@ app.get('/health', async (c) => {
     {
       status: allHealthy ? 'healthy' : 'degraded',
       checks,
+      debug: c.env.ENVIRONMENT === 'development' || !allHealthy ? debug : undefined,
       timestamp: new Date().toISOString(),
     },
     allHealthy ? 200 : 503

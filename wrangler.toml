@@ -11,3 +11,8 @@ DRUPAL_BASE_URL = "https://snij-drupal.onrender.com"
 [[kv_namespaces]]
 binding = "KV"
 id = "490cd50c27f143f2a7a21690627a5f6c"
+
+# Service Binding pour communication directe avec Foundry
+[[services]]
+binding = "FOUNDRY"
+service = "snij-foundry"

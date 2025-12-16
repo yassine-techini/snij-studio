@@ -22,7 +22,7 @@ export const snijConfig: StudioConfig = {
       maxSources: 5, // 5 sources max pour réponses précises
       temperature: 0.3, // Faible température pour réponses factuelles
       maxTokens: 2048,
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-3-haiku-20240307',
       confidenceThreshold: 0.7,
     },
 
@@ -40,7 +40,7 @@ export const snijConfig: StudioConfig = {
     },
     reranker: {
       topK: 5, // Top 5 pour génération
-      minScore: 0.3,
+      minScore: 0.01, // Lowered to work with RRF scores
     },
   },
 

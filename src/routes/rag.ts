@@ -65,6 +65,7 @@ ragRoutes.post('/', async (c) => {
   return c.json({
     success: result.success,
     data: result.data,
+    error: result.error, // Debug: expose error details
     meta: {
       executionTime: result.executionTime,
     },

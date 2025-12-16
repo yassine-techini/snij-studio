@@ -7,6 +7,8 @@ export interface Bindings {
   DRUPAL_BASE_URL: string;
   KV: KVNamespace;
   ENVIRONMENT: string;
+  // Service Binding pour communication directe avec Foundry
+  FOUNDRY: Fetcher;
 }
 
 export interface Variables {

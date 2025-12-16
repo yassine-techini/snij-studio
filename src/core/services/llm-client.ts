@@ -17,7 +17,7 @@ export interface StreamGenerateOptions extends GenerateOptions {
 
 export class LLMClient {
   private client: Anthropic;
-  private defaultModel = 'claude-sonnet-4-20250514';
+  private defaultModel = 'claude-3-5-sonnet-20241022';
 
   constructor(env: Bindings) {
     this.client = new Anthropic({

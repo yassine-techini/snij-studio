@@ -22,10 +22,24 @@ export class Retriever {
     const topK = options.topK ?? this.config.retriever.topK;
 
     // Recherche parallèle lexicale + sémantique
-    const [lexical, semantic] = await Promise.all([
+    const [lexicalResult, semanticResult] = await Promise.allSettled([
       this.foundry.queryLexical(options.query, options.filters, topK),
       this.foundry.searchSemantic(options.query, options.filters, topK),
     ]);
+
+    const lexical = lexicalResult.status === 'fulfilled' ? lexicalResult.value : [];
+    const semantic = semanticResult.status === 'fulfilled' ? semanticResult.value : [];
+
+    // Log for debugging
+    console.log('[Retriever] Lexical results:', lexical.length);
+    console.log('[Retriever] Semantic results:', semantic.length);
+
+    if (lexicalResult.status === 'rejected') {
+      console.error('[Retriever] Lexical search failed:', lexicalResult.reason);
+    }
+    if (semanticResult.status === 'rejected') {
+      console.error('[Retriever] Semantic search failed:', semanticResult.reason);
+    }
 
     // Fusion RRF
     return this.reciprocalRankFusion(lexical, semantic);
